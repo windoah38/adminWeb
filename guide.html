@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="utf-8">
+  <title>HANA World Admin Guide</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .guide {
+      background: rgba(40, 44, 52, 0.9);
+      padding: 20px;
+      border-radius: 8px;
+    }
+
+    .guide h2 {
+      margin-top: 0
+    }
+
+    .guide a {
+      color: #00ffcc;
+    }
+
+    .kbd {
+      padding: 2px 6px;
+      border: 1px solid #555;
+      border-radius: 4px;
+      font-family: monospace;
+    }
+
+    ul li {
+      margin: 6px 0;
+    }
+
+    .mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header class="main-header" style="display:flex;justify-content:space-between;align-items:center;">
+      <h1>📖 HANA World Admin 사용 가이드</h1>
+      <nav><a class="btn-secondary" href="./index.html"
+          style="text-decoration:none;padding:10px 14px;border-radius:8px;">⬅ 대시보드로</a></nav>
+    </header>
+
+    <section class="guide">
+      <h2>1) 준비물</h2>
+      <ul>
+        <li>브라우저 + MetaMask 또는 Trust Wallet</li>
+        <li>네트워크:
+          <ul style="margin-top:5px;padding-left:20px;">
+            <li><b>Ethereum Mainnet (Chain ID: 1)</b> - 실제 운영 네트워크</li>
+            <li><b>Sepolia Testnet (Chain ID: 11155111)</b> - 테스트 네트워크</li>
+          </ul>
+        </li>
+        <li>컨트랙트 <b>주소</b></li>
+        <li>충분한 ETH (가스비용)
+          <ul style="margin-top:5px;padding-left:20px;">
+            <li>메인넷: 실제 ETH 필요</li>
+            <li>세폴리아: 테스트 ETH (무료 Faucet에서 받기)</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h2>2) 초기 설정</h2>
+      <ol>
+        <li><span class="kbd">smartcontract.js</span>에 <b>컨트랙트 주소</b>를 입력합니다.</li>
+        <li><span class="kbd">index.html</span>을 열고 상단에서 <b>네트워크 선택</b> → <b>지갑 연결</b>을 진행합니다.
+          <ul style="margin-top:5px;padding-left:20px;">
+            <li>Ethereum Mainnet: 실제 서비스용</li>
+            <li>Sepolia Testnet: 테스트 및 개발용</li>
+          </ul>
+        </li>
+        <li>우측 상단의 <b>권한 레벨</b>이 <code>OWNER</code>인지 확인합니다.</li>
+        <li><b>네트워크 자동 전환</b>: 선택한 네트워크와 지갑이 다르면 자동으로 전환을 요청합니다.</li>
+      </ol>
+
+      <h3>💡 Sepolia 테스트 ETH 받기</h3>
+      <ul>
+        <li><a href="https://sepoliafaucet.com" target="_blank">Sepolia Faucet</a> - 무료 테스트 ETH</li>
+        <li><a href="https://www.alchemy.com/faucets/ethereum-sepolia" target="_blank">Alchemy Sepolia Faucet</a></li>
+        <li><a href="https://faucet.quicknode.com/ethereum/sepolia" target="_blank">QuickNode Sepolia Faucet</a></li>
+      </ul>
+
+      <h2>3) 컨트랙트 상태</h2>
+      <p>현재 토큰 상태를 한눈에 확인하는 섹션입니다. <b>상태 새로고침</b>으로 최신 상태를 가져오고, <b>빠른 제어</b> 버튼으로 <code>pause</code>,
+        <code>unpause</code>를 즉시 전환할 수 있습니다.</p>
+      <ul class="mono">
+        <li>name: HANA World, symbol: HWT, decimals: 18</li>
+        <li>totalSupply (총 발행량): 1,000,000,000 HWT</li>
+        <li>paused (일시정지 여부)</li>
+        <li>owner (컨트랙트 소유자)</li>
+      </ul>
+
+      <h2>4) Lockup 관리</h2>
+      
+      <h3 style="color:#ff6b6b;">⚠️ 매우 중요: 락업은 "덮어쓰기" 방식입니다!</h3>
+      <div style="background:rgba(255,107,107,0.1);border:2px solid #ff6b6b;padding:15px;border-radius:8px;margin:15px 0;">
+        <p><strong>setLockup()과 decreaseLockAmount()는 기존 값을 완전히 새로운 값으로 교체합니다!</strong></p>
+        <ul style="margin-top:10px;">
+          <li><strong>시나리오 1:</strong> 
+            <ul style="margin-top:5px;padding-left:20px;">
+              <li>현재 락업: 1000 HWT</li>
+              <li>setLockup(주소, 시간, <strong style="color:#ff6b6b;">100</strong>)을 실행</li>
+              <li>최종 결과: <strong style="color:#ff6b6b;">100 HWT</strong> (❌ 1100 아님!)</li>
+            </ul>
+          </li>
+          <li><strong>시나리오 2 (감소):</strong>
+            <ul style="margin-top:5px;padding-left:20px;">
+              <li>현재 락업: 1000 HWT</li>
+              <li>decreaseLockAmount(주소, <strong style="color:#ff6b6b;">700</strong>)을 실행</li>
+              <li>최종 결과: <strong style="color:#ff6b6b;">700 HWT</strong> (❌ 300 아님!)</li>
+            </ul>
+          </li>
+          <li><strong>시나리오 3 (부분 해제 - 차감 방식):</strong>
+            <ul style="margin-top:5px;padding-left:20px;">
+              <li>현재 락업: 1000 HWT</li>
+              <li>releaseLockup(주소, <strong style="color:#00ffcc;">300</strong>)을 실행</li>
+              <li>최종 결과: <strong style="color:#00ffcc;">700 HWT</strong> (✅ 차감됨!)</li>
+            </ul>
+          </li>
+        </ul>
+        <p style="margin-top:15px;color:#00ffcc;"><strong>💡 핵심 요약:</strong></p>
+        <ul>
+          <li><code>setLockup()</code>: 완전히 새로운 락업으로 교체</li>
+          <li><code>decreaseLockAmount()</code>: 새로운 수량으로 교체 (현재보다 작아야 함)</li>
+          <li><code>releaseLockup()</code>: 입력한 수량만큼 차감 (유일하게 빼기 방식)</li>
+          <li><code>extendLockup()</code>: 시간만 추가 (수량 불변, 만료 전에만 가능)</li>
+        </ul>
+      </div>
+
+      <h3>📋 각 락업 함수 상세 설명</h3>
+      <ul>
+        <li><b>새 락업 설정 (setLockup)</b>: 특정 주소의 토큰을 일정 기간 동안 잠급니다
+          <ul style="margin-top:5px;">
+            <li>시간: 분 단위로 입력 (정수만 가능)</li>
+            <li>수량: 소수점 입력 가능 (예: 100.5 HWT)</li>
+            <li><strong style="color:#ff6b6b;">기존 락업이 있으면 완전히 새 값으로 교체됨!</strong></li>
+          </ul>
+        </li>
+        <li><b>락업 연장 (extendLockup)</b>: 기존 락업 기간을 추가로 연장합니다 (분 단위 정수)
+          <ul style="margin-top:5px;">
+            <li>수량은 변경되지 않고 <strong>시간만 추가</strong>됩니다</li>
+            <li>락업이 없는 주소에는 사용 불가</li>
+            <li><strong style="color:#ff6b6b;">만료된 락업은 연장 불가 (LockupExpired 에러 발생)</strong></li>
+          </ul>
+        </li>
+        <li><b>락업 수량 감소 (decreaseLockAmount)</b>: 락업된 수량을 줄입니다
+          <ul style="margin-top:5px;">
+            <li>소수점 가능, 0으로 설정 시 전체 해제</li>
+            <li><strong style="color:#ff6b6b;">현재 수량보다 작은 값만 가능하며, 기존 값에서 빼는 것이 아니라 새 값으로 교체!</strong></li>
+            <li>예: 1000 → 700 입력 → 최종 700 (300이 아님!)</li>
+          </ul>
+        </li>
+        <li><b>락업 부분 해제 (releaseLockup)</b>: 락업 중 일부 수량만 해제합니다
+          <ul style="margin-top:5px;">
+            <li>소수점 가능</li>
+            <li><strong style="color:#00ffcc;">입력한 수량만큼 기존 락업에서 차감됩니다 (유일한 빼기 방식!)</strong></li>
+            <li>예: 1000 락업 → 300 해제 → 최종 700 락업</li>
+          </ul>
+        </li>
+        <li><b>만료된 락업 제거 (clearExpiredLockup)</b>: 기간이 만료된 락업 정보를 삭제합니다
+          <ul style="margin-top:5px;">
+            <li><strong>필수 작업이 아닙니다</strong> - 만료되면 자동으로 효력이 없어집니다</li>
+            <li>단지 컨트랙트 저장소를 깔끔하게 정리하는 용도</li>
+            <li>만료되지 않은 락업에는 사용 불가 (에러 발생)</li>
+          </ul>
+        </li>
+      </ul>
+      <p><b>보안</b>: Owner만 락업 관리 기능을 실행할 수 있습니다.</p>
+      
+      <h3>💡 락업 시간 예시</h3>
+      <table style="width:100%;border-collapse:collapse;margin-top:10px;">
+        <thead>
+          <tr style="background-color:rgba(0,255,204,0.1);">
+            <th style="border:1px solid #555;padding:8px;">기간</th>
+            <th style="border:1px solid #555;padding:8px;">분(Minutes)</th>
+            <th style="border:1px solid #555;padding:8px;">용도</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="border:1px solid #555;padding:8px;">1시간</td>
+            <td style="border:1px solid #555;padding:8px;">60</td>
+            <td style="border:1px solid #555;padding:8px;">테스트용</td>
+          </tr>
+          <tr>
+            <td style="border:1px solid #555;padding:8px;">1일</td>
+            <td style="border:1px solid #555;padding:8px;">1,440</td>
+            <td style="border:1px solid #555;padding:8px;">단기 락업</td>
+          </tr>
+          <tr>
+            <td style="border:1px solid #555;padding:8px;">1주일</td>
+            <td style="border:1px solid #555;padding:8px;">10,080</td>
+            <td style="border:1px solid #555;padding:8px;">일주일 이벤트</td>
+          </tr>
+          <tr>
+            <td style="border:1px solid #555;padding:8px;">1개월(30일)</td>
+            <td style="border:1px solid #555;padding:8px;">43,200</td>
+            <td style="border:1px solid #555;padding:8px;">월간 베스팅</td>
+          </tr>
+          <tr>
+            <td style="border:1px solid #555;padding:8px;">1년(365일)</td>
+            <td style="border:1px solid #555;padding:8px;">525,600</td>
+            <td style="border:1px solid #555;padding:8px;">장기 베스팅</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>💰 토큰 수량 예시 (소수점 가능)</h3>
+      <ul>
+        <li>정수: 100 HWT, 1000 HWT, 1000000 HWT</li>
+        <li>소수점 1자리: 100.5 HWT, 999.9 HWT</li>
+        <li>소수점 2자리: 99.99 HWT, 1234.56 HWT</li>
+        <li>소수점 많은 자리: 123.456789 HWT, 0.00001 HWT</li>
+      </ul>
+
+      <h2>5) Lockup 조회</h2>
+      <ul>
+        <li><b>락업 정보 확인</b>: 주소의 락업 수량, 남은 시간, 만료 시각 조회</li>
+        <li><b>사용 가능 잔액 확인</b>: 전체 잔액 중 락업되지 않은 수량 조회</li>
+        <li>가스비가 들지 않는 조회 함수입니다</li>
+      </ul>
+
+      <h2>6) 토큰 전송</h2>
+      <ul>
+        <li>자신의 토큰을 다른 주소로 전송합니다</li>
+        <li>락업된 토큰은 전송할 수 없습니다</li>
+        <li>전송자는 충분한 잔액과 ETH(가스비)를 보유해야 합니다</li>
+      </ul>
+
+      <h2>7) 토큰 소각</h2>
+      <ul>
+        <li><b>소각</b>: 자신의 토큰을 영구적으로 제거합니다</li>
+        <li>소각된 토큰은 복구할 수 없으므로 신중하게 사용하세요</li>
+        <li>총 공급량이 감소합니다</li>
+      </ul>
+
+      <h2>8) 토큰 정보 조회</h2>
+      <ul>
+        <li><b>토큰 잔액 조회</b>: 특정 주소의 HWT 보유량 확인</li>
+        <li>가스비가 들지 않는 읽기 전용 함수입니다</li>
+      </ul>
+
+      <h2>오류 해결</h2>
+      <ul>
+        <li><b>"Cannot read properties of undefined (reading 'eth')"</b>
+          <ul style="margin-top:8px;">
+            <li>원인: 지갑이 연결되지 않은 상태에서 조회 기능 사용</li>
+            <li>해결: 먼저 MetaMask 또는 Trust Wallet 지갑을 연결한 후 조회하세요</li>
+          </ul>
+        </li>
+        <li><b>"현재 네트워크에서 컨트랙트를 찾을 수 없습니다"</b>
+          <ul style="margin-top:8px;">
+            <li>원인: 잘못된 네트워크 선택 또는 컨트랙트 주소 불일치</li>
+            <li>해결: smartcontract.js의 주소와 네트워크 선택을 확인하세요</li>
+            <li>주의: 메인넷과 세폴리아는 컨트랙트 주소가 다를 수 있습니다</li>
+          </ul>
+        </li>
+        <li><b>"가스 추정에 실패했습니다"</b>
+          <ul style="margin-top:8px;">
+            <li>원인: 입력값 오류, 권한 부족, 또는 컨트랙트 상태 문제</li>
+            <li>해결: 입력값, 권한(Owner), 잔액을 확인하세요</li>
+          </ul>
+        </li>
+        <li><b>"락업이 이미 만료되었습니다 (LockupExpired)"</b>
+          <ul style="margin-top:8px;">
+            <li>원인: 만료된 락업을 연장하려고 시도</li>
+            <li>해결: 만료된 락업은 연장할 수 없습니다. 새로운 락업을 설정하세요</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h2>보안 권장</h2>
+      <ul>
+        <li>Owner 권한은 최소한으로 관리하세요</li>
+        <li>중요한 작업은 멀티시그/하드웨어 월렛 권장</li>
+        <li>컨트랙트 주소를 항상 재확인하세요 (피싱 방지)</li>
+        <li>락업 설정 시 시간과 수량을 반드시 재확인하세요</li>
+        <li>대량의 토큰 작업 전 소량으로 먼저 테스트하세요</li>
+        <li><strong>메인넷에서 작업 전 세폴리아에서 먼저 테스트하세요</strong></li>
+      </ul>
+
+      <h2>네트워크 비교</h2>
+      <table style="width:100%;border-collapse:collapse;margin-top:10px;">
+        <thead>
+          <tr style="background-color:rgba(0,255,204,0.1);">
+            <th style="border:1px solid #555;padding:8px;">구분</th>
+            <th style="border:1px solid #555;padding:8px;">Ethereum Mainnet</th>
+            <th style="border:1px solid #555;padding:8px;">Sepolia Testnet</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="border:1px solid #555;padding:8px;"><b>Chain ID</b></td>
+            <td style="border:1px solid #555;padding:8px;">1</td>
+            <td style="border:1px solid #555;padding:8px;">11155111</td>
+          </tr>
+          <tr>
+            <td style="border:1px solid #555;padding:8px;"><b>용도</b></td>
+            <td style="border:1px solid #555;padding:8px;">실제 운영</td>
+            <td style="border:1px solid #555;padding:8px;">테스트 및 개발</td>
+          </tr>
+          <tr>
+            <td style="border:1px solid #555;padding:8px;"><b>ETH 획득</b></td>
+            <td style="border:1px solid #555;padding:8px;">거래소에서 구매</td>
+            <td style="border:1px solid #555;padding:8px;">무료 Faucet</td>
+          </tr>
+          <tr>
+            <td style="border:1px solid #555;padding:8px;"><b>가스비</b></td>
+            <td style="border:1px solid #555;padding:8px;">실제 비용 발생</td>
+            <td style="border:1px solid #555;padding:8px;">무료 (테스트 ETH)</td>
+          </tr>
+          <tr>
+            <td style="border:1px solid #555;padding:8px;"><b>Explorer</b></td>
+            <td style="border:1px solid #555;padding:8px;">etherscan.io</td>
+            <td style="border:1px solid #555;padding:8px;">sepolia.etherscan.io</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>Etherscan 활용</h2>
+      <ul>
+        <li><b>컨트랙트 페이지</b>: 컨트랙트 소스 코드, 이벤트, 트랜잭션 확인</li>
+        <li><b>토큰 트래커</b>: 총 공급량, 홀더 수, 거래량 확인</li>
+        <li><b>홀더 랭킹</b>: 상위 홀더 목록 및 분포도 확인</li>
+        <li><b>메인넷</b>: <a href="https://etherscan.io" target="_blank">etherscan.io</a></li>
+        <li><b>세폴리아</b>: <a href="https://sepolia.etherscan.io" target="_blank">sepolia.etherscan.io</a></li>
+      </ul>
+
+      <h2>주요 기능 요약</h2>
+      <table style="width:100%;border-collapse:collapse;margin-top:10px;">
+        <thead>
+          <tr style="background-color:rgba(0,255,204,0.1);">
+            <th style="border:1px solid #555;padding:8px;">기능</th>
+            <th style="border:1px solid #555;padding:8px;">권한</th>
+            <th style="border:1px solid #555;padding:8px;">가스비</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="border:1px solid #555;padding:8px;">일시정지/정상화</td>
+            <td style="border:1px solid #555;padding:8px;">OWNER</td>
+            <td style="border:1px solid #555;padding:8px;">○</td>
+          </tr>
+          <tr>
+            <td style="border:1px solid #555;padding:8px;">락업 설정/연장/감소/해제</td>
+            <td style="border:1px solid #555;padding:8px;">OWNER</td>
+            <td style="border:1px solid #555;padding:8px;">○</td>
+          </tr>
+          <tr>
+            <td style="border:1px solid #555;padding:8px;">락업 정보 조회</td>
+            <td style="border:1px solid #555;padding:8px;">누구나</td>
+            <td style="border:1px solid #555;padding:8px;">×</td>
+          </tr>
+          <tr>
+            <td style="border:1px solid #555;padding:8px;">토큰 전송</td>
+            <td style="border:1px solid #555;padding:8px;">토큰 보유자</td>
+            <td style="border:1px solid #555;padding:8px;">○</td>
+          </tr>
+          <tr>
+            <td style="border:1px solid #555;padding:8px;">토큰 소각</td>
+            <td style="border:1px solid #555;padding:8px;">토큰 보유자</td>
+            <td style="border:1px solid #555;padding:8px;">○</td>
+          </tr>
+          <tr>
+            <td style="border:1px solid #555;padding:8px;">잔액 조회</td>
+            <td style="border:1px solid #555;padding:8px;">누구나</td>
+            <td style="border:1px solid #555;padding:8px;">×</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>추가 도움말</h2>
+      <ul>
+        <li><b>MetaMask 사용법</b>: <a href="https://metamask.io/faqs" target="_blank">공식 FAQ</a> 참고</li>
+        <li><b>세폴리아 네트워크 추가</b>: 자동으로 추가됨 (수동 추가도 가능)</li>
+        <li><b>Etherscan</b>: <a href="https://etherscan.io" target="_blank">메인넷</a> / <a href="https://sepolia.etherscan.io" target="_blank">세폴리아</a> 탐색기</li>
+        <li><b>가스비 절약</b>: 네트워크가 붐비지 않은 시간대에 트랜잭션 전송</li>
+        <li><b>문의</b>: 컨트랙트 관련 문의는 개발팀에 문의하세요</li>
+      </ul>
+    </section>
+  </div>
+</body>
+
+</html>
