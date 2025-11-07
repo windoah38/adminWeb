@@ -52,15 +52,13 @@
         <li>브라우저 + MetaMask 또는 Trust Wallet</li>
         <li>네트워크:
           <ul style="margin-top:5px;padding-left:20px;">
-            <li><b>Ethereum Mainnet (Chain ID: 1)</b> - 실제 운영 네트워크</li>
-            <li><b>Sepolia Testnet (Chain ID: 11155111)</b> - 테스트 네트워크</li>
+            <li><b>Binance Smart Chain Mainnet (Chain ID: 56)</b> - 실제 운영 네트워크</li>
           </ul>
         </li>
         <li>컨트랙트 <b>주소</b></li>
-        <li>충분한 ETH (가스비용)
+        <li>충분한 BNB (가스비용)
           <ul style="margin-top:5px;padding-left:20px;">
-            <li>메인넷: 실제 ETH 필요</li>
-            <li>세폴리아: 테스트 ETH (무료 Faucet에서 받기)</li>
+            <li>메인넷: 실제 BNB 필요 (거래소에서 구매 가능)</li>
           </ul>
         </li>
       </ul>
@@ -68,22 +66,10 @@
       <h2>2) 초기 설정</h2>
       <ol>
         <li><span class="kbd">smartcontract.js</span>에 <b>컨트랙트 주소</b>를 입력합니다.</li>
-        <li><span class="kbd">index.html</span>을 열고 상단에서 <b>네트워크 선택</b> → <b>지갑 연결</b>을 진행합니다.
-          <ul style="margin-top:5px;padding-left:20px;">
-            <li>Ethereum Mainnet: 실제 서비스용</li>
-            <li>Sepolia Testnet: 테스트 및 개발용</li>
-          </ul>
-        </li>
+        <li><span class="kbd">index.html</span>을 열고 상단에서 <b>BSC 메인넷 선택</b> → <b>지갑 연결</b>을 진행합니다.</li>
         <li>우측 상단의 <b>권한 레벨</b>이 <code>OWNER</code>인지 확인합니다.</li>
         <li><b>네트워크 자동 전환</b>: 선택한 네트워크와 지갑이 다르면 자동으로 전환을 요청합니다.</li>
       </ol>
-
-      <h3>💡 Sepolia 테스트 ETH 받기</h3>
-      <ul>
-        <li><a href="https://sepoliafaucet.com" target="_blank">Sepolia Faucet</a> - 무료 테스트 ETH</li>
-        <li><a href="https://www.alchemy.com/faucets/ethereum-sepolia" target="_blank">Alchemy Sepolia Faucet</a></li>
-        <li><a href="https://faucet.quicknode.com/ethereum/sepolia" target="_blank">QuickNode Sepolia Faucet</a></li>
-      </ul>
 
       <h2>3) 컨트랙트 상태</h2>
       <p>현재 토큰 상태를 한눈에 확인하는 섹션입니다. <b>상태 새로고침</b>으로 최신 상태를 가져오고, <b>빠른 제어</b> 버튼으로 <code>pause</code>,
@@ -229,7 +215,7 @@
       <ul>
         <li>자신의 토큰을 다른 주소로 전송합니다</li>
         <li>락업된 토큰은 전송할 수 없습니다</li>
-        <li>전송자는 충분한 잔액과 ETH(가스비)를 보유해야 합니다</li>
+        <li>전송자는 충분한 잔액과 BNB(가스비)를 보유해야 합니다</li>
       </ul>
 
       <h2>7) 토큰 소각</h2>
@@ -256,14 +242,13 @@
         <li><b>"현재 네트워크에서 컨트랙트를 찾을 수 없습니다"</b>
           <ul style="margin-top:8px;">
             <li>원인: 잘못된 네트워크 선택 또는 컨트랙트 주소 불일치</li>
-            <li>해결: smartcontract.js의 주소와 네트워크 선택을 확인하세요</li>
-            <li>주의: 메인넷과 세폴리아는 컨트랙트 주소가 다를 수 있습니다</li>
+            <li>해결: smartcontract.js의 주소와 BSC 메인넷(Chain ID: 56) 선택을 확인하세요</li>
           </ul>
         </li>
         <li><b>"가스 추정에 실패했습니다"</b>
           <ul style="margin-top:8px;">
             <li>원인: 입력값 오류, 권한 부족, 또는 컨트랙트 상태 문제</li>
-            <li>해결: 입력값, 권한(Owner), 잔액을 확인하세요</li>
+            <li>해결: 입력값, 권한(Owner), BNB 잔액을 확인하세요</li>
           </ul>
         </li>
         <li><b>"락업이 이미 만료되었습니다 (LockupExpired)"</b>
@@ -281,54 +266,57 @@
         <li>컨트랙트 주소를 항상 재확인하세요 (피싱 방지)</li>
         <li>락업 설정 시 시간과 수량을 반드시 재확인하세요</li>
         <li>대량의 토큰 작업 전 소량으로 먼저 테스트하세요</li>
-        <li><strong>메인넷에서 작업 전 세폴리아에서 먼저 테스트하세요</strong></li>
+        <li><strong style="color:#ff6b6b;">⚠️ 메인넷에서 직접 작업하므로 모든 트랜잭션은 실제 BNB가 소모되고 복구 불가능합니다</strong></li>
+        <li><strong>중요 작업 전 컨트랙트 함수를 "call"로 시뮬레이션하여 결과를 미리 확인하세요</strong></li>
       </ul>
 
-      <h2>네트워크 비교</h2>
+      <h2>BSC 네트워크 정보</h2>
       <table style="width:100%;border-collapse:collapse;margin-top:10px;">
         <thead>
           <tr style="background-color:rgba(0,255,204,0.1);">
             <th style="border:1px solid #555;padding:8px;">구분</th>
-            <th style="border:1px solid #555;padding:8px;">Ethereum Mainnet</th>
-            <th style="border:1px solid #555;padding:8px;">Sepolia Testnet</th>
+            <th style="border:1px solid #555;padding:8px;">Binance Smart Chain Mainnet</th>
           </tr>
         </thead>
         <tbody>
           <tr>
             <td style="border:1px solid #555;padding:8px;"><b>Chain ID</b></td>
-            <td style="border:1px solid #555;padding:8px;">1</td>
-            <td style="border:1px solid #555;padding:8px;">11155111</td>
+            <td style="border:1px solid #555;padding:8px;">56</td>
+          </tr>
+          <tr>
+            <td style="border:1px solid #555;padding:8px;"><b>RPC URL</b></td>
+            <td style="border:1px solid #555;padding:8px;">https://bsc-dataseed.binance.org/</td>
+          </tr>
+          <tr>
+            <td style="border:1px solid #555;padding:8px;"><b>통화 기호</b></td>
+            <td style="border:1px solid #555;padding:8px;">BNB</td>
           </tr>
           <tr>
             <td style="border:1px solid #555;padding:8px;"><b>용도</b></td>
-            <td style="border:1px solid #555;padding:8px;">실제 운영</td>
-            <td style="border:1px solid #555;padding:8px;">테스트 및 개발</td>
+            <td style="border:1px solid #555;padding:8px;">실제 운영 (프로덕션)</td>
           </tr>
           <tr>
-            <td style="border:1px solid #555;padding:8px;"><b>ETH 획득</b></td>
-            <td style="border:1px solid #555;padding:8px;">거래소에서 구매</td>
-            <td style="border:1px solid #555;padding:8px;">무료 Faucet</td>
+            <td style="border:1px solid #555;padding:8px;"><b>BNB 획득</b></td>
+            <td style="border:1px solid #555;padding:8px;">거래소에서 구매 (바이낸스, 업비트, 빗썸 등)</td>
           </tr>
           <tr>
             <td style="border:1px solid #555;padding:8px;"><b>가스비</b></td>
-            <td style="border:1px solid #555;padding:8px;">실제 비용 발생</td>
-            <td style="border:1px solid #555;padding:8px;">무료 (테스트 ETH)</td>
+            <td style="border:1px solid #555;padding:8px;">실제 비용 발생 (약 $0.10~$0.50)</td>
           </tr>
           <tr>
             <td style="border:1px solid #555;padding:8px;"><b>Explorer</b></td>
-            <td style="border:1px solid #555;padding:8px;">etherscan.io</td>
-            <td style="border:1px solid #555;padding:8px;">sepolia.etherscan.io</td>
+            <td style="border:1px solid #555;padding:8px;"><a href="https://bscscan.com" target="_blank">bscscan.com</a></td>
           </tr>
         </tbody>
       </table>
 
-      <h2>Etherscan 활용</h2>
+      <h2>BscScan 활용</h2>
       <ul>
         <li><b>컨트랙트 페이지</b>: 컨트랙트 소스 코드, 이벤트, 트랜잭션 확인</li>
         <li><b>토큰 트래커</b>: 총 공급량, 홀더 수, 거래량 확인</li>
         <li><b>홀더 랭킹</b>: 상위 홀더 목록 및 분포도 확인</li>
-        <li><b>메인넷</b>: <a href="https://etherscan.io" target="_blank">etherscan.io</a></li>
-        <li><b>세폴리아</b>: <a href="https://sepolia.etherscan.io" target="_blank">sepolia.etherscan.io</a></li>
+        <li><b>트랜잭션 검증</b>: 모든 트랜잭션의 상태 및 가스 소모량 확인</li>
+        <li><b>메인넷</b>: <a href="https://bscscan.com" target="_blank">bscscan.com</a></li>
       </ul>
 
       <h2>주요 기능 요약</h2>
@@ -376,12 +364,32 @@
 
       <h2>추가 도움말</h2>
       <ul>
-        <li><b>MetaMask 사용법</b>: <a href="https://metamask.io/faqs" target="_blank">공식 FAQ</a> 참고</li>
-        <li><b>세폴리아 네트워크 추가</b>: 자동으로 추가됨 (수동 추가도 가능)</li>
-        <li><b>Etherscan</b>: <a href="https://etherscan.io" target="_blank">메인넷</a> / <a href="https://sepolia.etherscan.io" target="_blank">세폴리아</a> 탐색기</li>
-        <li><b>가스비 절약</b>: 네트워크가 붐비지 않은 시간대에 트랜잭션 전송</li>
+        <li><b>MetaMask에 BSC 네트워크 추가</b>: 
+          <ul style="margin-top:5px;padding-left:20px;">
+            <li>네트워크 이름: Binance Smart Chain</li>
+            <li>RPC URL: https://bsc-dataseed.binance.org/</li>
+            <li>Chain ID: 56</li>
+            <li>통화 기호: BNB</li>
+            <li>블록 탐색기: https://bscscan.com</li>
+          </ul>
+        </li>
+        <li><b>BscScan</b>: <a href="https://bscscan.com" target="_blank">메인넷</a> 탐색기에서 모든 트랜잭션 확인 가능</li>
+        <li><b>가스비 절약</b>: 네트워크가 붐비지 않은 시간대에 트랜잭션 전송 (보통 새벽 시간대)</li>
+        <li><b>BNB 구매</b>: 바이낸스, 업비트, 빗썸 등 한국 거래소에서 구매 후 MetaMask로 전송</li>
         <li><b>문의</b>: 컨트랙트 관련 문의는 개발팀에 문의하세요</li>
       </ul>
+
+      <h2 style="color:#ff6b6b;">⚠️ 메인넷 운영 시 주의사항</h2>
+      <div style="background:rgba(255,107,107,0.1);border:2px solid #ff6b6b;padding:15px;border-radius:8px;margin:15px 0;">
+        <ul>
+          <li><strong>테스트넷이 없으므로 모든 작업이 실제 블록체인에 기록되고 복구 불가능합니다</strong></li>
+          <li>소량의 토큰으로 먼저 테스트한 후 대량 작업을 진행하세요</li>
+          <li>락업 설정 시 시간과 수량을 여러 번 확인하세요 (실수 시 복구 불가)</li>
+          <li>컨트랙트 주소를 반드시 BscScan에서 확인하세요 (피싱 방지)</li>
+          <li>Owner 개인키는 하드웨어 월렛 또는 멀티시그로 보호하세요</li>
+          <li>중요한 트랜잭션 전 가스비 여유분을 확보하세요 (최소 0.01 BNB 이상)</li>
+        </ul>
+      </div>
     </section>
   </div>
 </body>
