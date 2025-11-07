@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <title>HANA World 관리자 - 토큰 관리 대시보드</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="HANA World Token 관리 도구 – 이더리움 메인넷 & 세폴리아 테스트넷 지원">
+  <meta name="description" content="HANA World Token 관리 도구 – Binance Smart Chain 메인넷 지원">
   <!-- 라이브러리 -->
   <script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js/dist/web3.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
@@ -22,7 +22,7 @@
     <header class="main-header" style="display:flex;justify-content:space-between;align-items:center;gap:12px;">
       <div>
         <h1>🪙 HANA World Token<br> 관리자 대시보드</h1>
-        <p class="subtitle">HWT ERC20 토큰을 쉽고 안전하게 관리하세요 (Ethereum Mainnet & Sepolia Testnet)</p>
+        <p class="subtitle">HWT BEP20 토큰을 쉽고 안전하게 관리하세요 (Binance Smart Chain Mainnet)</p>
       </div>
       <nav>
         <a class="btn-secondary" href="./guide.html" target="_blank"
@@ -34,11 +34,10 @@
     <section class="wallet-section">
       <div class="wallet-connection" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
         <button class="btn-connect-wallet" onclick="connectWallet()">🔗 지갑 연결 (MetaMask / Trust Wallet)</button>
-        <label for="networkSelect" style="font-weight:600;">네트워크:</label>
-        <select id="networkSelect" class="form-input" style="max-width:220px;">
-          <option value="1">Ethereum Mainnet</option>
-          <option value="11155111">Sepolia Testnet</option>
-        </select>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 16px;background:rgba(0,255,204,0.1);border-radius:8px;border:1px solid #00ffcc;">
+          <span style="font-weight:600;color:#00ffcc;">🌐 네트워크:</span>
+          <span style="font-weight:700;color:#fff;">Binance Smart Chain (BSC)</span>
+        </div>
       </div>
       <div class="connection-help">
         <small>💡 MetaMask 또는 Trust Wallet이 없다면 <a href="https://metamask.io" target="_blank">설치</a>하세요.</small>
@@ -51,7 +50,7 @@
             <span id="walletAddress" class="info-value">연결되지 않음</span>
           </div>
           <div class="info-item">
-            <span class="info-label">💰 ETH 잔고:</span>
+            <span class="info-label">💰 BNB 잔고:</span>
             <span id="walletBalance" class="info-value">-</span>
           </div>
           <div class="info-item">
@@ -66,10 +65,10 @@
       </div>
     </section>
 
-    <!-- Etherscan 바로가기 -->
+    <!-- BscScan 바로가기 -->
     <section class="category">
       <h2 onclick="toggleCategory(this)" class="category-header">
-        🔍 Etherscan 바로가기
+        🔍 BscScan 바로가기
         <span class="toggle-icon">&#9662;</span>
         <span class="category-desc">컨트랙트/토큰 트래커/홀더 보기</span>
       </h2>
@@ -79,7 +78,7 @@
           <a href="" id="etherscanTokenTracker" target="_blank" class="btn-external">🪙 토큰 트래커</a>
           <a href="" id="etherscanHoldAddress" target="_blank" class="btn-external">📊 홀더 랭킹</a>
         </div>
-        <p class="note">📌 네트워크 선택(상단) 및 지갑 연결 후 정확한 링크가 생성됩니다.</p>
+        <p class="note">📌 지갑 연결 후 정확한 링크가 생성됩니다.</p>
       </div>
     </section>
 
@@ -290,7 +289,7 @@
     </section>
 
     <footer style="margin-top:32px;text-align:center;opacity:0.8;">
-      <small>© HANA World Token Admin • ERC20 Token Dashboard (Ethereum Mainnet & Sepolia Testnet)</small>
+      <small>© HANA World Token Admin • BEP20 Token Dashboard (Binance Smart Chain Mainnet)</small>
     </footer>
   </div>
 
