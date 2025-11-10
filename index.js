@@ -1100,152 +1100,140 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 });
 
-// =========================
-// 0) 로고 절대경로 상수 (권장)
-// =========================
-// 배포 도메인에 logo.png가 루트에 있다면 다음 한 줄이면 충분합니다.
+// ===== 공용 유틸 =====
+const __opLock = { busy: false };         // 단일 실행(뮤텍스)
 const TOKEN_LOGO_ABS = new URL('/logo.png', window.location.origin).toString();
 
-// =========================
-// 1) HTTPS 절대경로만 허용하는 로고 Resolver
-// =========================
-function resolveTokenLogo() {
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+function toast(msg, t = 1800) {           // alert() 대신 비차단 토스트 (WebView 팝업 충돌 방지)
   try {
-    // 1순위: 명시 상수
-    if (typeof TOKEN_LOGO_ABS === 'string' && /^https:\/\//i.test(TOKEN_LOGO_ABS)) {
-      return TOKEN_LOGO_ABS;
+    let box = document.getElementById('__toast');
+    if (!box) {
+      box = document.createElement('div');
+      box.id = '__toast';
+      Object.assign(box.style, {
+        position:'fixed',left:'50%',bottom:'24px',transform:'translateX(-50%)',
+        background:'rgba(0,0,0,.85)',color:'#fff',padding:'10px 14px',borderRadius:'8px',
+        fontSize:'14px',zIndex:99999,maxWidth:'90%',textAlign:'center'
+      });
+      document.body.appendChild(box);
     }
-    // 2순위: 흔한 경로 후보 → 절대경로 변환
-    const candidates = ['logo.png', '/logo.png', 'img/logo.png', '/img/logo.png', 'assets/logo.png', '/assets/logo.png'];
-    for (const c of candidates) {
-      const abs = new URL(c, window.location.origin).toString();
-      if (/^https:\/\//i.test(abs)) return abs;
-    }
-  } catch (_) {}
-  return null;
+    box.textContent = msg;
+    box.style.opacity = '1';
+    setTimeout(()=>{ box.style.opacity='0'; }, t);
+  } catch(_) {}
 }
 
-// =========================
-// 2) 모바일/인앱 감지 & 딥링크 유도
-// =========================
-function isMobile() {
-  return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-}
+function isMobile() { return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent); }
 function isMetaMaskInApp() {
-  // 메타마스크 모바일 인앱 브라우저는 isMetaMask + 특정 UA 패턴
   const ua = navigator.userAgent || '';
   const hasProvider = typeof window.ethereum !== 'undefined' && window.ethereum.isMetaMask;
   return hasProvider && /MetaMaskMobile/i.test(ua);
 }
-function ensureInMetaMaskApp() {
-  if (!isMobile()) return true; // 데스크탑은 통과
-  if (isMetaMaskInApp()) return true;
 
-  // 메타마스크 인앱으로 현재 dApp 열기 (설치 안 되어 있으면 스토어로 이동)
-  const target = encodeURIComponent(window.location.href);
-  const deeplink = `https://metamask.app.link/dapp/${target.replace(/^https?:\/\//, '')}`;
-  window.location.href = deeplink;
-  return false;
+// HTTPS 절대경로만 사용 (일부 모바일에서 http/리다이렉트 아이콘 무시)
+function resolveTokenLogo() {
+  try {
+    if (/^https:\/\//i.test(TOKEN_LOGO_ABS)) return TOKEN_LOGO_ABS;
+    const abs = new URL('/logo.png', window.location.origin).toString();
+    return /^https:\/\//i.test(abs) ? abs : null;
+  } catch(_) { return null; }
 }
 
-// =========================
-// 3) 커스텀 토큰 추가 (모바일 호환 강화)
-// =========================
-async function addCustomToken() {
+async function prefetchLogo(url) {         // 아이콘 미리 캐시 → watchAsset 중 이미지 I/O 줄이기
+  if (!url) return false;
   try {
-    // (A) 메타데이터 검증
-    if (typeof CONTRACT_ADDRESS === 'undefined' || !/^0x[a-fA-F0-9]{40}$/.test(CONTRACT_ADDRESS)) {
-      alert('토큰 컨트랙트 주소가 올바르지 않습니다. smartcontract.js의 CONTRACT_ADDRESS를 확인하세요.');
-      return;
-    }
+    await new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(true);
+      img.onerror = reject;
+      img.src = url;
+    });
+    return true;
+  } catch { return false; }
+}
 
-    // (B) 메타마스크 인앱 유도 (모바일일 때)
-    if (!ensureInMetaMaskApp()) return;
+// ===== 충돌 줄인 안전한 토큰 추가 =====
+async function addCustomToken() {
+  // 1) 단일 실행 보장 (연속 클릭/중복 요청 방지)
+  if (__opLock.busy) { toast('처리 중입니다…'); return; }
+  __opLock.busy = true;
 
-    // (C) 공급자 확인
+  // 2) 모바일 메타마스크 인앱 아닌 경우 안내
+  if (isMobile() && !isMetaMaskInApp()) {
+    // 인앱 전환은 이전 단계에서 이미 구현되어 있다면 호출만 유지
+    toast('MetaMask 인앱 브라우저에서 열어주세요.');
+    __opLock.busy = false;
+    return;
+  }
+
+  try {
+    // 3) 공급자 점검
     if (typeof window.ethereum === 'undefined') {
-      // (모바일 일반 브라우저) 인앱 강제 유도 후 종료
-      alert('지갑이 감지되지 않아 MetaMask 인앱 브라우저로 이동합니다.');
-      ensureInMetaMaskApp();
+      toast('지갑이 감지되지 않았습니다.');
       return;
     }
 
-    // (D) 네트워크 체크/전환 (기존 함수 사용)
-    const ok = await checkAndSwitchNetwork();
+    // 4) 네트워크 전환 → 리스너가 UI 변화를 트리거하므로 잠깐 대기
+    //    (기존 함수 재사용: checkAndSwitchNetwork) 
+    const ok = await checkAndSwitchNetwork();   // BSC로 전환/추가, 내부에서 alert 사용 (기존 코드)
     if (!ok) return;
 
-    // (E) 이미지 준비 (HTTPS 절대경로만)
+    // 전환 직후 지갑 팝업/내부 상태 안정화 대기
+    await sleep(350);
+
+    // 5) 아이콘 준비(HTTPS) 및 사전 캐시
     const logoAbs = resolveTokenLogo();
-    if (!logoAbs) {
-      // HTTPS가 아니거나 위치를 못 찾은 경우 안내
-      if (!/^https:\/\//i.test(window.location.origin)) {
-        alert('로고 이미지를 표시하려면 HTTPS에서 접속해야 합니다. HTTPS로 배포 후 다시 시도하세요.');
-      }
-    }
+    const logoReady = await prefetchLogo(logoAbs);
 
-    // (F) 1차 시도: 이미지 포함
-    const paramsWithImage = {
-      method: 'wallet_watchAsset',
-      params: {
-        type: 'ERC20',
-        options: {
-          address: CONTRACT_ADDRESS,
-          symbol: 'HWT',        // 필요 시 실제 심볼로 교체
-          decimals: 18,
-          image: logoAbs || undefined
-        }
-      }
-    };
+    // 6) 계정 권한 요청이 아직 안됐다면 먼저 계정 요청 (모바일에서 안정적)
+    try { await window.ethereum.request({ method: 'eth_requestAccounts' }); } catch {}
 
+    // 7) 1차: 이미지 포함하여 watchAsset
     let wasAdded = false;
     try {
-      wasAdded = await window.ethereum.request(paramsWithImage);
-    } catch (e1) {
-      // 일부 모바일은 image 파라미터에 예민 → 이미지 없이 재시도
-      console.warn('watchAsset with image failed, retrying without image...', e1);
-    }
-
-    // (G) 2차 시도: 이미지 없이(토큰 추가를 우선 보장)
-    if (!wasAdded) {
-      const paramsNoImage = {
+      wasAdded = await window.ethereum.request({
         method: 'wallet_watchAsset',
         params: {
           type: 'ERC20',
           options: {
             address: CONTRACT_ADDRESS,
             symbol: 'HWT',
-            decimals: 18
-            // image 생략
+            decimals: 18,
+            image: logoReady ? logoAbs : undefined
           }
         }
-      };
+      });
+    } catch (e1) {
+      // 8) 실패 시 소폭 대기 후 이미지 없이 재시도 (일부 모바일 버전에서 유효)
+      await sleep(250);
       try {
-        wasAdded = await window.ethereum.request(paramsNoImage);
+        wasAdded = await window.ethereum.request({
+          method: 'wallet_watchAsset',
+          params: {
+            type: 'ERC20',
+            options: { address: CONTRACT_ADDRESS, symbol: 'HWT', decimals: 18 }
+          }
+        });
       } catch (e2) {
-        // 미지원 지갑 또는 인앱 아님
-        const msg = e2?.message || String(e2);
-        if (/unsupported|not supported|unrecognized|does not exist/i.test(msg)) {
-          alert([
-            '⚠️ 사용 중인 지갑이 자동 추가를 완전히 지원하지 않습니다.',
-            `지갑에서 "토큰 가져오기" → 주소: ${CONTRACT_ADDRESS}`,
-            `심볼: HWT, 소수점: 18`,
-            logoAbs ? `로고 URL(선택): ${logoAbs}` : null
-          ].filter(Boolean).join('\n'));
-          return;
-        }
-        alert('토큰 추가 중 오류가 발생했습니다.\n\n' + friendlyError(e2));
+        // 미지원/예외 → 사용자에게 수동 추가 정보 제공 (토스트로 간단 안내)
+        toast('지갑에서 토큰 자동 추가를 지원하지 않습니다.\n수동으로 토큰 가져오기를 사용하세요.');
+        console.warn('watchAsset failed:', e1, e2);
         return;
       }
     }
 
-    // (H) 결과 안내
+    // 9) 완료 안내 (alert 대신 토스트 사용 → WebView 팝업 충돌 방지)
     if (wasAdded) {
-      // 일부 모바일은 아이콘이 지연 반영 → 안내
-      alert('✅ 토큰이 추가되었습니다. (모바일에서는 로고가 즉시 안 보일 수 있으며, 잠시 후 반영됩니다)');
+      toast('✅ 토큰이 추가되었습니다. 아이콘이 늦게 반영될 수 있어요.');
     } else {
-      alert('ℹ️ 사용자가 토큰 추가를 취소했습니다.');
+      toast('ℹ️ 사용자가 추가를 취소했습니다.');
     }
-  } catch (e) {
-    alert('토큰 추가 처리 중 예기치 못한 오류가 발생했습니다.\n\n' + friendlyError(e));
+
+  } finally {
+    // 10) 잠금 해제 (약간의 쿨다운으로 더블클릭 방지)
+    await sleep(300);
+    __opLock.busy = false;
   }
 }
