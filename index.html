@@ -34,7 +34,12 @@
     <section class="wallet-section">
       <div class="wallet-connection" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
         <button class="btn-connect-wallet" onclick="connectWallet()">🔗 지갑 연결 (MetaMask / Trust Wallet)</button>
-        <div style="display:flex;align-items:center;gap:10px;padding:10px 16px;background:rgba(0,255,204,0.1);border-radius:8px;border:1px solid #00ffcc;">
+        <!-- ===== 커스텀 토큰 추가 버튼 ===== -->
+        <div class="wallet-connection" style="margin-top:8px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+          <button class="btn-primary" onclick="addCustomToken()">➕ 메타마스크에 HWT 토큰 추가</button>
+        </div>
+        <div
+          style="display:flex;align-items:center;gap:10px;padding:10px 16px;background:rgba(0,255,204,0.1);border-radius:8px;border:1px solid #00ffcc;">
           <span style="font-weight:600;color:#00ffcc;">🌐 네트워크:</span>
           <span style="font-weight:700;color:#fff;">Binance Smart Chain (BSC)</span>
         </div>
@@ -94,11 +99,16 @@
           <button class="btn-secondary" onclick="loadContractState()">🔄 상태 새로고침</button>
         </div>
         <div class="info-grid">
-          <div class="info-item"><span class="info-label">📛 토큰명:</span> <span id="st_name" class="info-value">-</span></div>
-          <div class="info-item"><span class="info-label">🔤 심볼:</span> <span id="st_symbol" class="info-value">-</span></div>
-          <div class="info-item"><span class="info-label">🔢 소수점:</span> <span id="st_decimals" class="info-value">-</span></div>
-          <div class="info-item"><span class="info-label">📊 총 발행량:</span> <span id="st_totalSupply" class="info-value">-</span></div>
-          <div class="info-item"><span class="info-label">⏸ 일시정지:</span> <span id="st_paused" class="info-value">-</span></div>
+          <div class="info-item"><span class="info-label">📛 토큰명:</span> <span id="st_name" class="info-value">-</span>
+          </div>
+          <div class="info-item"><span class="info-label">🔤 심볼:</span> <span id="st_symbol" class="info-value">-</span>
+          </div>
+          <div class="info-item"><span class="info-label">🔢 소수점:</span> <span id="st_decimals"
+              class="info-value">-</span></div>
+          <div class="info-item"><span class="info-label">📊 총 발행량:</span> <span id="st_totalSupply"
+              class="info-value">-</span></div>
+          <div class="info-item"><span class="info-label">⏸ 일시정지:</span> <span id="st_paused"
+              class="info-value">-</span></div>
           <div class="info-item" style="grid-column: 1 / -1;">
             <span class="info-label">👑 Owner:</span>
             <span id="st_owner" class="info-value mono" style="word-break:break-all;">-</span>
@@ -124,7 +134,8 @@
         <span class="category-desc">토큰 락업 설정/연장/감소/해제</span>
       </h2>
       <div class="category-content">
-        <div class="lockup-warning" style="background:rgba(255,107,107,0.1);border-left:4px solid #ff6b6b;padding:15px;border-radius:6px;margin-bottom:20px;">
+        <div class="lockup-warning"
+          style="background:rgba(255,107,107,0.1);border-left:4px solid #ff6b6b;padding:15px;border-radius:6px;margin-bottom:20px;">
           <h3 style="color:#ff6b6b;margin-top:0;">⚠️ 중요: 락업 설정 방식</h3>
           <p style="margin:10px 0;"><strong>락업은 "덮어쓰기" 방식입니다!</strong></p>
           <ul style="margin:10px 0;padding-left:20px;">
@@ -136,14 +147,16 @@
         </div>
 
         <p class="note">⚠ Owner만 락업을 관리할 수 있습니다. 락업된 토큰은 기간 동안 전송이 불가능합니다.</p>
-        
+
         <!-- 락업 설정 -->
         <div class="form-group">
           <label class="form-label">🆕 새 락업 설정 (덮어쓰기) <span class="required-badge">OWNER</span></label>
-          <p class="function-desc">특정 주소의 토큰을 일정 기간 동안 잠급니다. <strong style="color:#ff6b6b;">기존 락업이 있다면 완전히 새로운 값으로 교체됩니다.</strong> 해당 주소는 락업 기간 동안 잠긴 수량만큼 전송할 수 없습니다.</p>
+          <p class="function-desc">특정 주소의 토큰을 일정 기간 동안 잠급니다. <strong style="color:#ff6b6b;">기존 락업이 있다면 완전히 새로운 값으로
+              교체됩니다.</strong> 해당 주소는 락업 기간 동안 잠긴 수량만큼 전송할 수 없습니다.</p>
           <input type="text" id="lockupAccount" placeholder="락업할 주소 (0x...)" class="form-input">
           <input type="number" id="lockupMinutes" placeholder="락업 시간 (분, 정수만)" class="form-input" min="1" step="1">
-          <input type="number" id="lockupAmount" placeholder="락업 수량 (HWT, 소수점 가능)" class="form-input" min="0" step="any">
+          <input type="number" id="lockupAmount" placeholder="락업 수량 (HWT, 소수점 가능)" class="form-input" min="0"
+            step="any">
           <button class="btn-primary owner-only" onclick="setLockup()">락업 설정</button>
           <small class="note">💡 예시: 100.5 HWT를 1440분(1일) 동안 락업. 기존 락업은 완전히 삭제되고 새 값으로 설정됩니다.</small>
         </div>
@@ -151,7 +164,8 @@
         <!-- 락업 연장 -->
         <div class="form-group">
           <label class="form-label">⏱ 락업 기간 연장 <span class="required-badge">OWNER</span></label>
-          <p class="function-desc">기존 락업의 만료 시간을 연장합니다. <strong>수량은 변경되지 않고 시간만 추가됩니다.</strong> 만료되지 않은 락업만 연장 가능합니다.</p>
+          <p class="function-desc">기존 락업의 만료 시간을 연장합니다. <strong>수량은 변경되지 않고 시간만 추가됩니다.</strong> 만료되지 않은 락업만 연장 가능합니다.
+          </p>
           <input type="text" id="extendAccount" placeholder="주소 (0x...)" class="form-input">
           <input type="number" id="extendMinutes" placeholder="추가 시간 (분, 정수만)" class="form-input" min="1" step="1">
           <button class="btn-primary owner-only" onclick="extendLockup()">락업 연장</button>
@@ -161,9 +175,11 @@
         <!-- 락업 수량 감소 -->
         <div class="form-group">
           <label class="form-label">📉 락업 수량 감소 (새 수량으로 설정) <span class="required-badge">OWNER</span></label>
-          <p class="function-desc">락업된 수량을 새로운 값으로 변경합니다. <strong style="color:#ff6b6b;">현재 수량보다 작은 값만 입력 가능하며, 기존 수량에서 빼는 것이 아니라 새로운 수량으로 교체됩니다.</strong> 0을 입력하면 락업이 완전히 해제됩니다.</p>
+          <p class="function-desc">락업된 수량을 새로운 값으로 변경합니다. <strong style="color:#ff6b6b;">현재 수량보다 작은 값만 입력 가능하며, 기존 수량에서
+              빼는 것이 아니라 새로운 수량으로 교체됩니다.</strong> 0을 입력하면 락업이 완전히 해제됩니다.</p>
           <input type="text" id="decreaseAccount" placeholder="주소 (0x...)" class="form-input">
-          <input type="number" id="decreaseAmount" placeholder="새로운 수량 (HWT, 0이면 전체 해제)" class="form-input" min="0" step="any">
+          <input type="number" id="decreaseAmount" placeholder="새로운 수량 (HWT, 0이면 전체 해제)" class="form-input" min="0"
+            step="any">
           <button class="btn-primary owner-only" onclick="decreaseLockAmount()">수량 감소</button>
           <small class="note">💡 예시: 기존 1000 HWT → 750.5 입력 → 최종 750.5 HWT 락업 (기존 값에서 750.5를 빼는 것이 아님!)</small>
         </div>
@@ -171,7 +187,8 @@
         <!-- 락업 부분 해제 -->
         <div class="form-group">
           <label class="form-label">🔓 락업 부분 해제 (차감 방식) <span class="required-badge">OWNER</span></label>
-          <p class="function-desc">락업된 수량 중 일부만 즉시 해제합니다. <strong>입력한 수량만큼 기존 락업에서 차감됩니다.</strong> 예: 현재 1000 HWT 락업 → 300 해제 → 최종 700 HWT 락업 유지.</p>
+          <p class="function-desc">락업된 수량 중 일부만 즉시 해제합니다. <strong>입력한 수량만큼 기존 락업에서 차감됩니다.</strong> 예: 현재 1000 HWT 락업 →
+            300 해제 → 최종 700 HWT 락업 유지.</p>
           <input type="text" id="releaseAccount" placeholder="주소 (0x...)" class="form-input">
           <input type="number" id="releaseAmount" placeholder="해제할 수량 (HWT)" class="form-input" min="0" step="any">
           <button class="btn-primary owner-only" onclick="releaseLockup()">부분 해제</button>
@@ -181,7 +198,8 @@
         <!-- 만료된 락업 제거 -->
         <div class="form-group">
           <label class="form-label">🗑 만료된 락업 정보 제거 (선택사항) <span class="required-badge">OWNER</span></label>
-          <p class="function-desc">기간이 만료된 락업 정보를 컨트랙트에서 삭제합니다. <strong>만료된 락업은 자동으로 효력이 없어지므로 이 작업은 필수가 아닙니다.</strong> 단지 저장 공간 정리용입니다.</p>
+          <p class="function-desc">기간이 만료된 락업 정보를 컨트랙트에서 삭제합니다. <strong>만료된 락업은 자동으로 효력이 없어지므로 이 작업은 필수가 아닙니다.</strong>
+            단지 저장 공간 정리용입니다.</p>
           <input type="text" id="clearAccount" placeholder="만료된 락업 주소 (0x...)" class="form-input">
           <button class="btn-warning owner-only" onclick="clearExpiredLockup()">만료 락업 제거</button>
           <small class="note">💡 락업 기간이 지난 주소 입력 시 저장소에서 제거하여 깔끔하게 정리. 필수 작업은 아닙니다.</small>
@@ -198,7 +216,7 @@
       </h2>
       <div class="category-content">
         <p class="note">누구나 조회 가능합니다. 가스비가 들지 않는 읽기 전용 함수입니다.</p>
-        
+
         <!-- 락업 정보 조회 -->
         <div class="form-group">
           <label class="form-label">🔎 락업 정보 확인 (무료 조회)</label>
@@ -214,9 +232,11 @@
         <!-- 사용 가능 잔액 조회 -->
         <div class="form-group">
           <label class="form-label">✅ 사용 가능 잔액 확인 (무료 조회)</label>
-          <p class="function-desc">특정 주소의 전체 잔액 중 실제로 전송 가능한 수량을 조회합니다. <strong>전체 잔액 - 락업 수량 = 사용 가능 잔액</strong>입니다.</p>
+          <p class="function-desc">특정 주소의 전체 잔액 중 실제로 전송 가능한 수량을 조회합니다. <strong>전체 잔액 - 락업 수량 = 사용 가능 잔액</strong>입니다.
+          </p>
           <div class="input-group" style="display:flex;gap:8px;flex-wrap:wrap;">
-            <input type="text" id="checkUnlockedAccount" placeholder="조회할 주소 (0x...)" class="form-input" style="flex:1;">
+            <input type="text" id="checkUnlockedAccount" placeholder="조회할 주소 (0x...)" class="form-input"
+              style="flex:1;">
             <button class="btn-secondary" onclick="checkUnlockedBalance()">조회</button>
           </div>
           <div id="unlockedBalanceResult" class="result-display"></div>
@@ -236,9 +256,11 @@
         <p class="note">자신의 토큰을 다른 주소로 전송합니다. 락업된 토큰은 전송할 수 없습니다.</p>
         <div class="form-group">
           <label class="form-label">💸 토큰 전송</label>
-          <p class="function-desc">보유한 HWT 토큰을 다른 주소로 전송합니다. <strong>락업된 수량은 전송할 수 없으며, 사용 가능한 잔액 내에서만 전송 가능합니다.</strong></p>
+          <p class="function-desc">보유한 HWT 토큰을 다른 주소로 전송합니다. <strong>락업된 수량은 전송할 수 없으며, 사용 가능한 잔액 내에서만 전송
+              가능합니다.</strong></p>
           <input type="text" id="transferTo" placeholder="받는 주소 (0x...)" class="form-input">
-          <input type="number" id="transferAmount" placeholder="전송 수량 (HWT, 소수점 가능)" class="form-input" min="0" step="any">
+          <input type="number" id="transferAmount" placeholder="전송 수량 (HWT, 소수점 가능)" class="form-input" min="0"
+            step="any">
           <button class="btn-primary" onclick="transferToken()">전송</button>
           <small class="note">💡 예시: 123.456 HWT 전송 가능. 락업 중인 토큰은 전송 불가합니다.</small>
         </div>
@@ -256,7 +278,8 @@
         <p class="note">자신의 토큰을 영구적으로 소각합니다. 이 작업은 되돌릴 수 없습니다.</p>
         <div class="form-group">
           <label class="form-label">🔥 토큰 소각 (영구 삭제)</label>
-          <p class="function-desc">보유한 HWT 토큰을 영구적으로 제거합니다. <strong style="color:#ff6b6b;">소각된 토큰은 절대 복구할 수 없으며, 총 공급량도 함께 감소합니다.</strong></p>
+          <p class="function-desc">보유한 HWT 토큰을 영구적으로 제거합니다. <strong style="color:#ff6b6b;">소각된 토큰은 절대 복구할 수 없으며, 총 공급량도
+              함께 감소합니다.</strong></p>
           <input type="number" id="burnAmount" placeholder="소각 수량 (HWT, 소수점 가능)" class="form-input" min="0" step="any">
           <button class="btn-danger" onclick="burnToken()">소각 (복구 불가)</button>
           <small class="note">⚠️ 소각된 토큰은 영구적으로 사라지며 총 공급량이 감소합니다 (예: 99.99 HWT)</small>
@@ -273,7 +296,7 @@
       </h2>
       <div class="category-content">
         <p class="note">컨트랙트에서 제공하는 읽기 함수만 사용합니다. 가스가 들지 않습니다.</p>
-        
+
         <!-- 잔액 조회 -->
         <div class="form-group">
           <label class="form-label">💰 토큰 잔액 조회 (무료)</label>
