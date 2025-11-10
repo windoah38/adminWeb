@@ -1099,3 +1099,66 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 });
+
+const TOKEN_META = {
+  address: typeof CONTRACT_ADDRESS !== 'undefined' ? CONTRACT_ADDRESS : '',
+  symbol: 'HWT',
+  decimals: 18,
+  image: null
+};
+
+function resolveTokenLogo() {
+  try {
+    const candidates = ['logo.png', 'img/logo.png', 'assets/logo.png', 'logo.webp', 'img/logo.webp'];
+    for (const c of candidates) {
+      return new URL(c, window.location.href).toString();
+    }
+  } catch (_) {}
+  return null;
+}
+
+async function addCustomToken() {
+  try {
+    if (!TOKEN_META.address || !/^0x[a-fA-F0-9]{40}$/.test(TOKEN_META.address)) {
+      alert('토큰 컨트랙트 주소가 올바르지 않습니다. smartcontract.js의 CONTRACT_ADDRESS를 확인하세요.');
+      return;
+    }
+    TOKEN_META.image = resolveTokenLogo();
+
+    if (typeof window.ethereum === 'undefined') {
+      openInMetaMaskBrowser(); // 모바일 딥링크 → 앱/스토어 유도
+      return;
+    }
+
+    const ok = await checkAndSwitchNetwork(); // BSC로 전환/추가
+    if (!ok) return;
+
+    const wasAdded = await window.ethereum.request({
+      method: 'wallet_watchAsset',
+      params: {
+        type: 'ERC20',
+        options: {
+          address: TOKEN_META.address,
+          symbol: TOKEN_META.symbol,
+          decimals: TOKEN_META.decimals,
+          image: TOKEN_META.image || undefined
+        }
+      }
+    });
+
+    alert(wasAdded ? `✅ ${TOKEN_META.symbol} 토큰이 추가되었습니다.` : `ℹ️ 사용자가 추가를 취소했습니다.`);
+  } catch (e) {
+    const msg = e?.message || String(e);
+    if (/unsupported|not supported|unrecognized|does not exist/i.test(msg)) {
+      alert([
+        '⚠️ 현재 사용 중인 지갑이 자동 추가를 지원하지 않습니다.',
+        `1) 지갑에서 "토큰 가져오기" 선택`,
+        `2) 주소: ${TOKEN_META.address}`,
+        `3) 심볼: ${TOKEN_META.symbol}, 소수점: ${TOKEN_META.decimals}`,
+        TOKEN_META.image ? `4) 로고 URL: ${TOKEN_META.image}` : null
+      ].filter(Boolean).join('\n'));
+      return;
+    }
+    alert('토큰 추가 중 오류가 발생했습니다.\n\n' + friendlyError(e));
+  }
+}
